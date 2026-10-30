@@ -1,0 +1,87 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
+}
+
+apply from: "version.gradle"
+
+android {
+    namespace 'com.skylake.skytv.jgorunner'
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId 'com.skylake.skytv.jgorunner'
+        // Strictly optimized for Android 4.4 KitKat (API 19)
+        minSdk 19
+
+        // Required for native binary execution from app filesDir on Android
+        //noinspection ExpiredTargetSdkVersion
+        targetSdk 28
+
+        versionCode appVersionCode
+        versionName "${appVersionName}-kitkat"
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_1_8)
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+        compose false
+    }
+
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation libs.exoplayer.core
+    implementation libs.exoplayer.hls
+    implementation libs.exoplayer.dash
+    implementation libs.exoplayer.ui
+    implementation libs.okhttp
+    implementation libs.conscrypt.android
+    implementation libs.gson
+    implementation libs.kotlinx.coroutines.core
+    implementation libs.kotlinx.coroutines.android
+    implementation libs.androidx.annotation
+    testImplementation libs.junit
+}
